@@ -4,6 +4,7 @@ from passlib.context import CryptContext
 from fastapi import HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
+from database import get_db  # <-- ensure this import is present
 
 SECRET_KEY = "your-secret-key"  # Replace with a secure value in prod!
 ALGORITHM = "HS256"
@@ -24,7 +25,7 @@ def create_access_token(data: dict):
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends()):
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     from crud import get_user_by_email  # <-- local import prevents circular import!
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -42,4 +43,3 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if user is None:
         raise credentials_exception
     return user
-    
