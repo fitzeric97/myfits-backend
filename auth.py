@@ -5,7 +5,7 @@ from fastapi import HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-SECRET_KEY = "your-secret-key"  # Change this to a secure secret in production
+SECRET_KEY = "your-secret-key"  # Replace with a secure value in prod!
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -25,7 +25,7 @@ def create_access_token(data: dict):
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends()):
-    from crud import get_user_by_email  # <--- local import here prevents circular import!
+    from crud import get_user_by_email  # <-- local import prevents circular import!
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -42,3 +42,4 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if user is None:
         raise credentials_exception
     return user
+    
